@@ -34,3 +34,22 @@ child_codes g er = filter (/= er) $ all_error_codes $ children g er
 
 --shortest_path :: Graph -> Ord -> Ord -> Path
 --istances_from_node :: Graph -> Ord -> [(Ord, Int)]
+
+shortest_path :: Graph -> ErrorCode -> ErrorCode -> [ErrorCode]
+shortest_path g a b = shortest_path2 g a b []
+--distances_from_node :: Graph -> Ord -> [(ErrorCode, Int)]
+
+test = shortest_path (windows_to_graph [[1,2,3],[3,4,5],[1,4,6]]) 4 3
+
+-- To make easy for now, limit so we can always travel the shortest path to next node
+shortest_path2 g a b visited
+    | null kids = [] -- maybe sb [a]
+    | a == b = reverse $ a:visited
+    | otherwise = check_paths g a b visited kids
+    where kids = filter (\ c -> not $ elem c visited) $ child_codes g a
+
+check_paths g a b visited candidates
+    | null candidates = []
+    | null shortest = check_paths g a b visited (tail candidates)
+    | otherwise = shortest
+    where shortest = shortest_path2 g (head candidates) b (a:visited)
